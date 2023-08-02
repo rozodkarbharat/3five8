@@ -12,34 +12,34 @@ app.get("/", (req, res) => {
   res.send("Welcome to homepage!");
 });
 
-app.post("/data", (req, res) => {
-  const { date, startTime, endTime } = req.body;
-  if (startTime < 10 || startTime > 21 || endTime > 22 || endTime < 11) {
-    res.send({ message: "Sorry! Clubhouse is closed" });
-  }
-  // const dateString = date;
-  // const dateObject = new Date(dateString);
-  // const timestamp = dateObject.getTime();
-  // console.log(dateObject,timestamp)
-
-  let date1 = Date.now();
-  let date2 = new Date(date);
-  console.log(date1 - date2);
-  if (date1 - date2 < 0) {
-    res.send({ message: "Date is Invalid" });
-  } else {
-    let clubhouse = bookedData.clubhouse;
-    console.log(clubhouse, date);
-    let dateExist = datafordateExist(clubhouse, date);
-    if (dateExist[1]) {
+app.post("/clubhouse", (req, res) => {
+  try {
+    const { date, startTime, endTime } = req.body;
+    if (startTime < 10 || startTime > 21 || endTime > 22 || endTime < 11) {
+      res.send({ message: "Sorry! Clubhouse is closed" });
+      return;
+    }
+    let date1 = new Date();
+    date1.setUTCHours(0, 0, 0, 0);
+    let date2 = new Date(date);
+    if (date2 - date1 <= -1) {
+      res.send({ message: "Date is Invalid" });
+      return;
+    } else {
+      let clubhouse = bookedData.clubhouse;
+      let dateExist = datafordateExist(clubhouse, date);
+      if (!dateExist[1]) {
+        bookedData.clubhouse.push({ date, bookedTime: [] });
+        clubhouse = bookedData.clubhouse;
+        dateExist = datafordateExist(clubhouse, date);
+      }
       let reqDate = clubhouse[dateExist[0]];
       let Time = reqDate["bookedTime"];
-      console.log(Time.length, "bookedTime");
       if (Time.length > 0) {
         for (let i = startTime; i < endTime; i++) {
           if (Time.includes(i)) {
-            res.send({ message: "Bookine Failed, Already Booked" });
-            return 
+            res.send({ message: "Booking Failed, Already Booked" });
+            return;
           }
         }
       }
@@ -58,27 +58,57 @@ app.post("/data", (req, res) => {
       }
       res.send({ message: `Booked, Rs. ${cost}` });
     }
-    else{
-        
-    }
+  } catch (err) {
+    res.send({ message: "Booking Failed", error: err.message });
   }
+});
 
-  // fs.readFile(dataPath, "utf8", (err, data) => {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   let date2=''
-  //   // // let clubhouse=data.clubhouse
-  //   // datafordateExist(clubhouse, date)
-  //   let today = Date.now();
-  //   res.send(JSON.parse(data));
-  // });
-  // res.send(bookedData)
+app.post("/tennis", (req, res) => {
+  try {
+    const { date, startTime, endTime } = req.body;
+    if (startTime < 10 || startTime > 21 || endTime > 22 || endTime < 11) {
+      res.send({ message: "Sorry! Tennis club is closed" });
+      return;
+    }
+    let date1 = new Date();
+    date1.setUTCHours(0, 0, 0, 0);
+    let date2 = new Date(date);
+    if (date2 - date1 <= -1) {
+      res.send({ message: "Date is Invalid" });
+      return;
+    }
+    let tennis = bookedData.tennis;
+    let dateExist = datafordateExist(tennis, date);
+    if (!dateExist[1]) {
+      bookedData.tennis.push({ date, bookedTime: [] });
+      tennis = bookedData.tennis;
+      dateExist = datafordateExist(tennis, date);
+    }
+
+    let reqDate = tennis[dateExist[0]];
+    let Time = reqDate["bookedTime"];
+    if (Time.length > 0) {
+      for (let i = startTime; i < endTime; i++) {
+        if (Time.includes(i)) {
+          res.send({ message: "Booking Failed, Already Booked" });
+          return;
+        }
+      }
+    }
+    for (let i = startTime; i < endTime; i++) {
+      Time.push(i);
+    }
+
+    tennis[dateExist[0]]["bookedTime"] = Time;
+    let cost = (endTime - startTime) * 50;
+    res.send({ message: `Booked, Rs. ${cost}` });
+  } catch (err) {
+    res.send({ message: "Booking Failed", error: err.message });
+  }
 });
 
 function datafordateExist(data, date) {
   for (var a = 0; a < data.length; a++) {
-    console.log(data[a]);
     if (data[a].date == date) {
       return [a, true];
     }
