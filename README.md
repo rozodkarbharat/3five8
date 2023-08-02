@@ -1,6 +1,6 @@
 
 
-<img src="./Image/assignment.png" alt=""/>
+<img width=600 src="./Image/assignment.png" alt=""/>
 
 <p>for booking seat in clubhouse</p>
 <p>https://threefive8-assignment.onrender.com/clubhouse</p>
