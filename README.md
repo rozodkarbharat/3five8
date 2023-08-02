@@ -1,5 +1,5 @@
 
-<h2>Problem statement</h2>
+
 <img src="./Image/assignment.png" alt=""/>
 
 <p>for booking seat in clubhouse</p>
