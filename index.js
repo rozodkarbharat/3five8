@@ -16,14 +16,14 @@ app.post("/clubhouse", (req, res) => {
   try {
     const { date, startTime, endTime } = req.body;
     if (startTime < 10 || startTime > 21 || endTime > 22 || endTime < 11) {
-      res.send({ message: "Sorry! Clubhouse is closed" });
+      res.status(400).json({ message: "Sorry! Clubhouse is closed" });
       return;
     }
     let date1 = new Date();
     date1.setUTCHours(0, 0, 0, 0);
     let date2 = new Date(date);
     if (date2 - date1 <= -1) {
-      res.send({ message: "Date is Invalid" });
+      res.status(400).json({ message: "Date is Invalid" });
       return;
     } else {
       let clubhouse = bookedData.clubhouse;
@@ -38,7 +38,7 @@ app.post("/clubhouse", (req, res) => {
       if (Time.length > 0) {
         for (let i = startTime; i < endTime; i++) {
           if (Time.includes(i)) {
-            res.send({ message: "Booking Failed, Already Booked" });
+            res.status(409).json({ message: "Booking Failed, Already Booked" });
             return;
           }
         }
@@ -56,10 +56,10 @@ app.post("/clubhouse", (req, res) => {
           cost += 500;
         }
       }
-      res.send({ message: `Booked, Rs. ${cost}` });
+      res.json({ message: `Booked, Rs. ${cost}` });
     }
   } catch (err) {
-    res.send({ message: "Booking Failed", error: err.message });
+    res.status(500).json({ message: "Booking Failed", error: err.message });
   }
 });
 
@@ -67,14 +67,14 @@ app.post("/tennis", (req, res) => {
   try {
     const { date, startTime, endTime } = req.body;
     if (startTime < 10 || startTime > 21 || endTime > 22 || endTime < 11) {
-      res.send({ message: "Sorry! Tennis club is closed" });
+      res.status(400).send({ message: "Sorry! Tennis club is closed" });
       return;
     }
     let date1 = new Date();
     date1.setUTCHours(0, 0, 0, 0);
     let date2 = new Date(date);
     if (date2 - date1 <= -1) {
-      res.send({ message: "Date is Invalid" });
+      res.status(400).json({ message: "Date is Invalid" });
       return;
     }
     let tennis = bookedData.tennis;
@@ -90,7 +90,7 @@ app.post("/tennis", (req, res) => {
     if (Time.length > 0) {
       for (let i = startTime; i < endTime; i++) {
         if (Time.includes(i)) {
-          res.send({ message: "Booking Failed, Already Booked" });
+          res.status(409).json({ message: "Booking Failed, Already Booked" });
           return;
         }
       }
@@ -103,7 +103,7 @@ app.post("/tennis", (req, res) => {
     let cost = (endTime - startTime) * 50;
     res.send({ message: `Booked, Rs. ${cost}` });
   } catch (err) {
-    res.send({ message: "Booking Failed", error: err.message });
+    res.status(500).json({ message: "Booking Failed", error: err.message });
   }
 });
 
